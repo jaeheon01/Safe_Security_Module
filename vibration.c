@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
-
+#include "shared.h"
 
 #define IN 0
 #define OUT 1
@@ -112,23 +112,22 @@ static int GPIOUnexport(int pin){
 	return 0;
 }
 
-int main() {
-	if (GPIOExport(PIR_PIN) == -1) return 1;
-	if (GPIODirection(PIR_PIN, IN) == -1) return 2;
+void* vibration_sensor(void* arg) {
+	if (GPIOExport(PIR_PIN) == -1) printf("Error_Exprot");
+	if (GPIODirection(PIR_PIN, IN) == -1) printf("Error_Direction");
 	
 	while(1) {
 		int state = GPIORead(PIR_PIN);
 		if (state == HIGH) {
-			printf("Motion detected!\n");
+			vibration_detected=1;
 		} else {
-			printf("No motion detected\n");
+			vibration_detected=0;
 		}
 		usleep(200* 1000);
 	}
 	
 	if(GPIOUnexport(PIR_PIN) == -1){ 
-		return 3;
+		printf("Error_Unexport");
 	}
-	return 0;
 }
 
