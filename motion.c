@@ -127,30 +127,12 @@ void* motion_sensor(void* arg) {
 			motion_detected=1;
 		} else {
 			motion_detected=0;
-
-int main() {
-	if (GPIOExport(PIR_PIN) == -1) return 1;
-	if (GPIODirection(PIR_PIN, IN) == -1) return 2;
-	
-	while(1) {
-		int motionDetected = GPIORead(PIR_PIN);
-		if (motionDetected == HIGH) {
-			printf("Motion detected!\n");
-		} else {
-			printf("No motion detected\n");
-
 		}
 		usleep(200* 1000);
 	}
 	
 	if(GPIOUnexport(PIR_PIN) == -1){ 
-
 		printf("Error_Unexport");
 	}
-
-		return 3;
-	}
-	return 0;
-
 }
 
