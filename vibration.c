@@ -120,36 +120,19 @@ static int GPIOUnexport(int pin){
 void* vibration_sensor(void* arg) {
 	if (GPIOExport(PIR_PIN) == -1) printf("Error_Exprot");
 	if (GPIODirection(PIR_PIN, IN) == -1) printf("Error_Direction");
-
-int main() {
-	if (GPIOExport(PIR_PIN) == -1) return 1;
-	if (GPIODirection(PIR_PIN, IN) == -1) return 2;
-
 	
 	while(1) {
 		int state = GPIORead(PIR_PIN);
 		if (state == HIGH) {
-
 			vibration_detected=1;
 		} else {
 			vibration_detected=0;
-
-			printf("Motion detected!\n");
-		} else {
-			printf("No motion detected\n");
-
 		}
 		usleep(200* 1000);
 	}
 	
 	if(GPIOUnexport(PIR_PIN) == -1){ 
-
 		printf("Error_Unexport");
 	}
-
-		return 3;
-	}
-	return 0;
-
 }
 
