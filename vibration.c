@@ -16,6 +16,7 @@
 #define VALUE_MAX 40
 #define DIRECTION_MAX 128
 
+
 static int GPIOExport(int pin) {
 #define BUFFER_MAX 3
 	char buffer[BUFFER_MAX];
@@ -117,17 +118,31 @@ void* vibration_sensor(void* arg) {
 	if (GPIODirection(PIR_PIN, IN) == -1) printf("Error_Direction");
 	
 	while(1) {
-		int state = GPIORead(PIR_PIN);
-		if (state == HIGH) {
-			vibration_detected=1;
-		} else {
-			vibration_detected=0;
+		pthread_mutex_lock(&lock);
+		while(step!=1){
+			pthread_cond_wait(&cond,&lock);
 		}
-		usleep(200* 1000);
+		
+		printf("[Vibration Sensor] Checking for vibration...\n");
+		usleep(200 * 1000);
+		if(GPIORead(PIR_PIN) == HIGH){
+			vibration_detected = 1;
+			printf("[Vibration Sensor] Vibration detected!\n");
+		}else{
+			vibration_detected = 0;
+			printf("[Vibration Sensor] No Vibration detected\n");
+		}
+		
+		step=2;
+		pthread_cond_broadcast(&cond);
+		pthread_mutex_unlock(&lock);
 	}
 	
 	if(GPIOUnexport(PIR_PIN) == -1){ 
 		printf("Error_Unexport");
 	}
 }
+
+
+
 
