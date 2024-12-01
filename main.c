@@ -4,9 +4,13 @@
 #include <unistd.h>
 #include "shared.h"
 
-//thread 공유 전역 변수
-int vibrationDetected = 0;
-int motionDetected = 0;
+
+int vibration_detected = 0;
+int motion_detected = 0;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+int step = 0;
+
 
 int main(){
     pthread_t vibration_thread, motion_thread;
@@ -19,20 +23,29 @@ int main(){
         fprintf(stderr, "Error creating motion sensor thread\n");
         return 2;
     }
-    vibrationDetected = vibration_detected;
-    motionDetected = motion_detected;
 
     while(1){
-        if(vibrationDetected && motionDetected){
-            printf("Motion detected!\n"); 
+		pthread_mutex_lock(&lock);
+		while(step!=2){
+			pthread_cond_wait(&cond,&lock);
+		}
+        if(vibration_detected && motion_detected){
+            printf("[Main] Invade detected by both sensor!\n"); 
         }
         else{
-            printf("No detected!\n");
+            printf("[Main] No Invade detected!\n");         
         }
+        motion_detected = 0;
+        vibration_detected = 0;
+        step = 0;
+        pthread_cond_broadcast(&cond);
+        pthread_mutex_unlock(&lock);
+        sleep(1);
     }
 
-    pthread_join(vibration_thread,NULL); //thread가 종료될때까지 메인 thread 대기
+    pthread_join(vibration_thread,NULL); 
     pthread_join(motion_thread,NULL);
 
     return 0;
 }
+
