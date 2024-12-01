@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "shared.h"
 
+
 int vibration_detected = 0;
 int motion_detected = 0;
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
@@ -47,3 +48,4 @@ int main(){
 
     return 0;
 }
+
