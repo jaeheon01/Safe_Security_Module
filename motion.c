@@ -17,7 +17,7 @@
 #define DIRECTION_MAX 128
 
 
-static int GPIOExport(int pin) {
+static int GPIOexport(int pin) {
 #define BUFFER_MAX 3
 	char buffer[BUFFER_MAX];
 	ssize_t bytes_written;
@@ -35,7 +35,7 @@ static int GPIOExport(int pin) {
 	return 0;
 }
 
-static int GPIODirection (int pin, int dir){
+static int GPIOdirection (int pin, int dir){
 	static const char s_directions_str[]="int\0out";
 	char path[DIRECTION_MAX];
 	int fd;
@@ -56,7 +56,7 @@ static int GPIODirection (int pin, int dir){
 	return 0;
 }
 
-static int GPIORead(int pin){
+static int GPIOread(int pin){
 	char path[DIRECTION_MAX];
 	char value_str[3];
 	int fd;
@@ -75,7 +75,7 @@ static int GPIORead(int pin){
 }
 
 
-static int GPIOWrite(int pin, int value){
+static int GPIOwrite(int pin, int value){
 	static const char s_values_str[] = "01";
 	
 	char path[VALUE_MAX];
@@ -96,7 +96,7 @@ static int GPIOWrite(int pin, int value){
 	return 0;
 }
 
-static int GPIOUnexport(int pin){
+static int GPIOunexport(int pin){
 	char buffer[BUFFER_MAX];
 	ssize_t bytes_written;
 	int fd;
@@ -114,8 +114,8 @@ static int GPIOUnexport(int pin){
 }
 
 void* motion_sensor(void* arg) {
-	if (GPIOExport(PIR_PIN) == -1) printf("Error_Exprot");
-	if (GPIODirection(PIR_PIN, IN) == -1) printf("Error_Direction");
+	if (GPIOexport(PIR_PIN) == -1) printf("Error_Exprot");
+	if (GPIOdirection(PIR_PIN, IN) == -1) printf("Error_Direction");
 	
 	while(1) {
 		pthread_mutex_lock(&lock);
@@ -124,7 +124,7 @@ void* motion_sensor(void* arg) {
 		}
 		printf("[Motion Sensor] Checking for motion...\n");
 		usleep(200*1000);
-		if(GPIORead(PIR_PIN) == HIGH){
+		if(GPIOread(PIR_PIN) == HIGH){
 			motion_detected = 1;
 			printf("[Motion Sensor] Motion detected!\n");
 		}else{
@@ -137,7 +137,7 @@ void* motion_sensor(void* arg) {
 		pthread_mutex_unlock(&lock);
 	}
 	
-	if(GPIOUnexport(PIR_PIN) == -1){ 
+	if(GPIOunexport(PIR_PIN) == -1){ 
 		printf("Error_Unexport");
 	}
 }

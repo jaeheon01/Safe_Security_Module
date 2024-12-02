@@ -7,7 +7,7 @@ void captureImage() {
     char command[128];
     char filename[64];
 
-    // 현재 시간을 기반으로 파일 이름 생성
+    // 현재 시간을 기반으로 파일 이름 생성!!
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
     snprintf(filename, sizeof(filename), "/home/pi/Pictures/capture_%04d%02d%02d_%02d%02d%02d.jpg",
