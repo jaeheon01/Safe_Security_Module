@@ -12,7 +12,7 @@
 #define OUT 1
 #define LOW 0
 #define HIGH 1
-#define PIR_PIN 22
+#define PIR_PIN 23
 #define VALUE_MAX 40
 #define DIRECTION_MAX 128
 
