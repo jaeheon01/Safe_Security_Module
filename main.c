@@ -29,6 +29,7 @@ int main(){
 
     // 센서 감지 루프
     while(1){
+        // 지금 반복문 한번에 코드가 두번씩 돌아가는거 같은데, 뭐가 문제인지 찾아야함!
 		pthread_mutex_lock(&lock);
 		while(step!=2){ // 두 센서가 모두 감지될 때까지 대기
 			pthread_cond_wait(&cond,&lock);
@@ -47,6 +48,7 @@ int main(){
         pthread_cond_broadcast(&cond);
         pthread_mutex_unlock(&lock);
         // 30초 대기
+        // TODO : 대기시간을 몇초로 설정할지!
         sleep(30);
     }
 
