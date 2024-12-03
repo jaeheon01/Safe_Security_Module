@@ -13,9 +13,7 @@ void* led_thread(void* arg);
 void* buzzer_thread(void* arg);
 
 void update_signal_status(int new_status) {
-    pthread_mutex_lock(&signal_mutex); // Mutex 잠금
     signal_status = new_status;
-    pthread_mutex_unlock(&signal_mutex); // Mutex 해제
 }
 
 int main(int argc, char* argv[]) {
@@ -64,11 +62,21 @@ int main(int argc, char* argv[]) {
         msg[str_len] = '\0';
 
         // 신호 상태 업데이트
+        // pthread_mutex_lock(&signal_mutex);
+        // if (strcmp(msg, "on") == 0) {
+        //     update_signal_status(HIGH); // LED 및 BUZZER ON 신호
+        // } else if (strcmp(msg, "off") == 0) {
+        //     update_signal_status(LOW); // LED 및 BUZZER OFF 신호
+        // }
+        // pthread_mutex_unlock(&signal_mutex);
         pthread_mutex_lock(&signal_mutex);
-        if (strcmp(msg, "on") == 0) {
-            update_signal_status(HIGH); // LED 및 BUZZER ON 신호
-        } else if (strcmp(msg, "off") == 0) {
-            update_signal_status(LOW); // LED 및 BUZZER OFF 신호
+        if (strcmp(msg,"off") == 0)
+        {
+            update_signal_status(LOW);
+        }
+        else
+        {
+            update_signal_status(HIGH);
         }
         pthread_mutex_unlock(&signal_mutex);
 

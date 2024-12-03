@@ -14,15 +14,16 @@ pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 int step = 0;
 
 void send_alert_to_client(int clnt_sock) {
-    char alert_msg[] = "on";
+    char alert_msg[] = "on\n"; // 명확한 구분자를 추가
 
     // 메시지 전송
-    if (write(clnt_sock, alert_msg, sizeof(alert_msg)) == -1) {
+    if (write(clnt_sock, alert_msg, strlen(alert_msg)) == -1) { // '\0' 제외
         perror("[Server] Failed to send alert");
     } else {
-        printf("[Server] Alert sent to client\n");
+        printf("[Server] Alert sent to client: %s\n", alert_msg);
     }
 }
+
 
 int main(int argc, char *argv[]) {
     pthread_t vibration_thread, motion_thread;
