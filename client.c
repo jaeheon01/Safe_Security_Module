@@ -65,9 +65,9 @@ int main(int argc, char* argv[]) {
 
         // 신호 상태 업데이트
         pthread_mutex_lock(&signal_mutex);
-        if (strcmp(msg, "on\n") == 0) {
+        if (strcmp(msg, "on") == 0) {
             update_signal_status(HIGH); // LED 및 BUZZER ON 신호
-        } else if (strcmp(msg, "off\n") == 0) {
+        } else if (strcmp(msg, "off") == 0) {
             update_signal_status(LOW); // LED 및 BUZZER OFF 신호
         }
         pthread_mutex_unlock(&signal_mutex);
