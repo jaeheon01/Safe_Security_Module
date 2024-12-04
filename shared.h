@@ -3,7 +3,7 @@
 
 #include <pthread.h>
 
-// 공용 플래그 및 동기화 객체
+// shared flag, signal status
 extern int motion_detected;
 extern int vibration_detected;
 extern int signal_status;
@@ -22,22 +22,22 @@ int GPIODirection(int pin, int dir);
 int GPIOWrite(int pin, int value);
 int GPIOUnexport(int pin);
 
-// 센서 함수
+// sensor function
 void* motion_sensor(void* arg);
 void* vibration_sensor(void* arg);
 
-// 액츄에이터 함수
+// actuator function
 void* buzzer_thread(void* arg);
 void* led_thread(void* arg);
 
 void update_signal_status(int new_status);
-// LED 제어 함수
+// LED control function
 int led_init();
 int led_on();
 int led_off();
 int led_cleanup();
 
-// BUZZER 제어 함수
+// BUZZER control function
 int buzzer_init();
 int buzzer_on();
 int buzzer_off();

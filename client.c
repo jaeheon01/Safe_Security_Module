@@ -6,12 +6,15 @@
 #include <arpa/inet.h>
 #include "shared.h"
 
-int signal_status = LOW; // 신호 상태 변수
-pthread_mutex_t signal_mutex = PTHREAD_MUTEX_INITIALIZER; // Mutex 선언
+// Initial signal status
+int signal_status = LOW; 
+// Initialize signal mutex
+pthread_mutex_t signal_mutex = PTHREAD_MUTEX_INITIALIZER; 
 
 void* led_thread(void* arg);
 void* buzzer_thread(void* arg);
 
+// signal update function
 void update_signal_status(int new_status) {
     signal_status = new_status;
 }
@@ -22,7 +25,7 @@ int main(int argc, char* argv[]) {
     char msg[2];
     pthread_t led_tid, buzzer_tid;
 
-    // 서버와 연결 설정
+    // server connection command line
     if (argc != 3) {
         printf("Usage: %s <server_ip> <port>\n", argv[0]);
         return -1;
@@ -47,7 +50,7 @@ int main(int argc, char* argv[]) {
 
     printf("[Client] Connected to server\n");
 
-    // LED 및 BUZZER 쓰레드 생성
+    // LED, Buzzer Thread Intialize
     pthread_create(&led_tid, NULL, led_thread, NULL);
     pthread_create(&buzzer_tid, NULL, buzzer_thread, NULL);
 
@@ -61,14 +64,7 @@ int main(int argc, char* argv[]) {
 
         msg[str_len] = '\0';
 
-        // 신호 상태 업데이트
-        // pthread_mutex_lock(&signal_mutex);
-        // if (strcmp(msg, "on") == 0) {
-        //     update_signal_status(HIGH); // LED 및 BUZZER ON 신호
-        // } else if (strcmp(msg, "off") == 0) {
-        //     update_signal_status(LOW); // LED 및 BUZZER OFF 신호
-        // }
-        // pthread_mutex_unlock(&signal_mutex);
+        // signal status update
         pthread_mutex_lock(&signal_mutex);
         if (strcmp(msg,"off") == 0)
         {
