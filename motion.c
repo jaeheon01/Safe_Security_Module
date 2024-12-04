@@ -1,4 +1,4 @@
-#include <fcntl.h>
+clude <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -6,21 +6,18 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
-
 #include "shared.h"
-
-
-
 
 #define IN 0
 #define OUT 1
 #define LOW 0
 #define HIGH 1
-#define PIR_PIN 22
+#define PIR_PIN 23
 #define VALUE_MAX 40
 #define DIRECTION_MAX 128
 
-static int GPIOExport(int pin) {
+
+static int GPIOexport(int pin) {
 #define BUFFER_MAX 3
 	char buffer[BUFFER_MAX];
 	ssize_t bytes_written;
@@ -38,7 +35,7 @@ static int GPIOExport(int pin) {
 	return 0;
 }
 
-static int GPIODirection (int pin, int dir){
+static int GPIOdirection (int pin, int dir){
 	static const char s_directions_str[]="int\0out";
 	char path[DIRECTION_MAX];
 	int fd;
@@ -59,7 +56,7 @@ static int GPIODirection (int pin, int dir){
 	return 0;
 }
 
-static int GPIORead(int pin){
+static int GPIOread(int pin){
 	char path[DIRECTION_MAX];
 	char value_str[3];
 	int fd;
@@ -78,7 +75,7 @@ static int GPIORead(int pin){
 }
 
 
-static int GPIOWrite(int pin, int value){
+static int GPIOwrite(int pin, int value){
 	static const char s_values_str[] = "01";
 	
 	char path[VALUE_MAX];
@@ -99,7 +96,7 @@ static int GPIOWrite(int pin, int value){
 	return 0;
 }
 
-static int GPIOUnexport(int pin){
+static int GPIOunexport(int pin){
 	char buffer[BUFFER_MAX];
 	ssize_t bytes_written;
 	int fd;
@@ -116,23 +113,37 @@ static int GPIOUnexport(int pin){
 	return 0;
 }
 
-
 void* motion_sensor(void* arg) {
-	if (GPIOExport(PIR_PIN) == -1) printf("Error_Exprot");
-	if (GPIODirection(PIR_PIN, IN) == -1) printf("Error_Direction");
+	if (GPIOexport(PIR_PIN) == -1) printf("Error_Exprot");
+	if (GPIOdirection(PIR_PIN, IN) == -1) printf("Error_Direction");
 	
 	while(1) {
-		int state = GPIORead(PIR_PIN);
-		if (state == HIGH) {
-			motion_detected=1;
-		} else {
-			motion_detected=0;
+		pthread_mutex_lock(&lock);
+		while(step!=0){
+			pthread_cond_wait(&cond,&lock);
 		}
-		usleep(200* 1000);
+		printf("[Motion Sensor] Checking for motion...\n");
+		usleep(200*1000);
+
+	int motion_status = GPIOread(PIR_PIN);
+        if (motion_status == HIGH) {
+            if (!motion_detected) { // 이전 상태가 LOW일 때만 감지
+                motion_detected = 1;
+                printf("[Motion Sensor] Motion detected!\n");
+            }
+        } else {
+            if (motion_detected) { // 이전 상태가 HIGH일 때만 변경
+                motion_detected = 0;
+                printf("[Motion Sensor] No Motion detected\n");
+            }
+        }
+		step=1;
+		
+		pthread_cond_broadcast(&cond);
+		pthread_mutex_unlock(&lock);
 	}
 	
-	if(GPIOUnexport(PIR_PIN) == -1){ 
+	if(GPIOunexport(PIR_PIN) == -1){ 
 		printf("Error_Unexport");
 	}
 }
-
