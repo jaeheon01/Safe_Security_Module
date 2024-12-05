@@ -33,11 +33,19 @@ def logout():
 # 사진 데이터를 제공하는 API
 @app.route("/api/photos")
 def get_photos():
-    photos = [
-        {"filePath": "/static/photo_01.jpg", "date": "2024-11-27", "time": "23:57:01"},
-        {"filePath": "/static/photo_02.jpg", "date": "2024-11-20", "time": "23:57:01"},
-        {"filePath": "/static/photo_03.jpg", "date": "2024-11-15", "time": "23:57:01"}
-    ]
+    photos = []
+    photo_directory = "/home/pi/Pictures"
+    for filename in os.listdir(photo_directory):
+        if filename.endswith(".jpg"):
+            # 파일 이름에서 날짜와 시간 추출
+            timestamp = filename.split("_")[1].split(".")[0]
+            date_str = f"{timestamp[:4]}-{timestamp[4:6]}-{timestamp[6:8]}"
+            time_str = f"{timestamp[9:11]}:{timestamp[11:13]}:{timestamp[13:15]}"
+            photos.append({
+                "filePath": f"/static/{filename}",
+                "date": date_str,
+                "time": time_str
+            })
     return jsonify(photos)
 
 # Safe System 상태 관리
