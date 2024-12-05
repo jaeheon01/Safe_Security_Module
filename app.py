@@ -3,6 +3,7 @@ import ctypes
 import os
 import shutil
 from shutil import copyfile
+import RPi.GPIO as GPIO
 
 # # C 라이브러리 불러오기
 # example = ctypes.CDLL('./example.so')
@@ -12,6 +13,12 @@ from shutil import copyfile
 # print("C 함수 결과:", result)
 
 app = Flask(__name__)
+
+# GPIO 핀 설정
+SENSOR_PIN = 17
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(SENSOR_PIN, GPIO.OUT)
+
 
 # 로그인 페이지
 @app.route('/')
@@ -72,25 +79,39 @@ def get_photos():
 # Safe System 상태 관리
 safe_system_state = "off"  # 초기 상태: off
 
+# @app.route('/toggle_sensor', methods=['POST'])
+# def toggle_sensor():
+#     global safe_system_state
+#     data = request.json
+#     new_state = data.get("state")
+
+#     if new_state not in ["on", "off"]:
+#         return jsonify({"success": False, "error": "Invalid state"}), 400
+
+#     # 상태 변경
+#     safe_system_state = new_state
+
+#     # 상태에 따라 state.txt 파일 초기화 및 기록
+#     state_value = "1" if safe_system_state == "on" else "0"
+#     with open("state.txt", "w") as state_file:
+#         state_file.truncate(0)  # 기존 내용 초기화
+#         state_file.write(state_value)
+
+#     return jsonify({"success": True, "message": f"Safe system toggled to {safe_system_state}"})
+
+
 @app.route('/toggle_sensor', methods=['POST'])
 def toggle_sensor():
-    global safe_system_state
     data = request.json
-    new_state = data.get("state")
-
-    if new_state not in ["on", "off"]:
-        return jsonify({"success": False, "error": "Invalid state"}), 400
-
-    # 상태 변경
-    safe_system_state = new_state
-
-    # 상태에 따라 state.txt 파일 초기화 및 기록
-    state_value = "1" if safe_system_state == "on" else "0"
-    with open("state.txt", "w") as state_file:
-        state_file.truncate(0)  # 기존 내용 초기화
-        state_file.write(state_value)
-
-    return jsonify({"success": True, "message": f"Safe system toggled to {safe_system_state}"})
+    state = data.get('state')
+    if state == "on":
+        GPIO.output(SENSOR_PIN, GPIO.HIGH)
+        return jsonify({"message": "Sensor turned ON"}), 200
+    elif state == "off":
+        GPIO.output(SENSOR_PIN, GPIO.LOW)
+        return jsonify({"message": "Sensor turned OFF"}), 200
+    else:
+        return jsonify({"error": "Invalid state"}), 400
 
 # Alarm 상태 관리
 alarm_state = "safe"  # 초기 상태: safe
@@ -123,4 +144,7 @@ def get_state():
         return jsonify({"error": "State file not found"}), 404
 
 if __name__ == "__main__":
-    app.run(debug=True, port=80, host='0.0.0.0')
+    try:
+        app.run(debug=True, port=80, host='0.0.0.0')
+    except KeyboardInterrupt:
+        GPIO.cleanup()
