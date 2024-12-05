@@ -57,7 +57,7 @@
                 </div>
             </div>
             
-            <div class="dashboard-card weather">
+            <!-- <div class="dashboard-card weather">
                 <div class="dashboard-card__title"><span class="fa fa-camera"></span>Photo</div>
                 <div class="dashboad-card__content">
                     <div class="dashboard-card__card-piece">
@@ -101,7 +101,26 @@
                         <a href="#" class="dashboard-card__link" tabindex="1">View in details<span class="fa fa-angle-right"></span></a>
                     </div>
                 </div>
+            </div> -->
+
+            <div class="dashboard-card weather">
+                <div class="dashboard-card__title"><span class="fa fa-camera"></span>Photo</div>
+                <div class="dashboard-card__content">
+                    <div class="dashboard-card__card-piece">
+                        <div class="weather-days" id="photo-container">
+                            <!-- 사진과 날짜를 표시할 부분 -->
+                            <div class="weather-days__item">
+                                <div class="weather-days__icon">
+                                    <img src="{{ url_for('static', filename='photo_01.jpg') }}" alt="Captured Photo" class="weather-icon-image">
+                                </div>
+                                <div class="weather-days__date">2024-11-27</div> <!-- 날짜 추가 -->
+                            </div>
+                        </div>
+                        <a href="#" class="dashboard-card__link" tabindex="1">View in details<span class="fa fa-angle-right"></span></a>
+                    </div>
+                </div>
             </div>
+            
 
             <div class="dashboard-card light">
                 <div class="dashboard-card__title"><span class="fa fa-lightbulb-o"></span>Safe System</div>
@@ -122,5 +141,26 @@
     <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 
     <!-- <script src="./dashboard.js"></script> -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyAuBwQT6kxUoSiieUdc6hKs4TQphvCOn_I",
+          authDomain: "system-pr.firebaseapp.com",
+          databaseURL: "https://system-pr-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "system-pr",
+          storageBucket: "system-pr.firebasestorage.app",
+          messagingSenderId: "365621185419",
+          appId: "1:365621185419:web:76bd48f9f949e75a95bd8e"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+      </script>
 </body>
+
 </html>

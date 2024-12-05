@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, render_template, request
 import ctypes
 import os
+import shutil
 from shutil import copyfile
 
 # # C 라이브러리 불러오기
@@ -32,34 +33,40 @@ def register():
 def logout():
     return render_template('login.html')
 
+# 사진을 /static/photos/ 폴더로 복사하는 함수
+def copy_photos():
+    photo_directory = "/home/pi/Pictures"
+    static_photo_directory = "static/photos"
+    if not os.path.exists(static_photo_directory):
+        os.makedirs(static_photo_directory)
+
+    # 디렉토리 내의 파일들을 /static/photos/로 복사
+    for filename in os.listdir(photo_directory):
+        if filename.endswith(".jpg"):
+            src_path = os.path.join(photo_directory, filename)
+            dest_path = os.path.join(static_photo_directory, filename)
+            shutil.copy(src_path, dest_path)
+
 # 사진 데이터를 제공하는 API
 @app.route("/api/photos")
 def get_photos():
-    
     photos = []
-    photo_directory = "/home/pi/Pictures/"
-    for filename in os.listdir(photo_directory):
+    copy_photos()  # 사진을 /static/photos/ 폴더로 복사
+
+    # /static/photos/ 폴더에서 사진 파일 목록 가져오기
+    static_photo_directory = "static/photos"
+    for filename in os.listdir(static_photo_directory):
         if filename.endswith(".jpg"):
-            try:
-                # 파일 이름에서 날짜와 시간 추출
-                # 예: capture_20241205_173443.jpg
-                parts = filename.split("_")  # ['capture', '20241205', '173443.jpg']
-                date_part = parts[1]  # '20241205'
-                time_part = parts[2].split(".")[0]  # '173443'
+            # 파일 이름에서 날짜와 시간 추출
+            timestamp = filename.split("_")[1].split(".")[0]
+            date_str = f"{timestamp[:4]}-{timestamp[4:6]}-{timestamp[6:8]}"
+            time_str = f"{timestamp[9:11]}:{timestamp[11:13]}:{timestamp[13:15]}"
+            photos.append({
+                "filePath": f"/static/photos/{filename}",  # static 폴더 경로
+                "date": date_str,
+                "time": time_str
+            })
 
-                # 날짜 및 시간 포맷
-                date_str = f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:]}"  # '2024-12-05'
-                time_str = f"{time_part[:2]}:{time_part[2:4]}:{time_part[4:]}"  # '17:34:43'
-
-                photos.append({
-                    "filePath": f"/static/{filename}",
-                    "date": date_str,
-                    "time": time_str
-                })
-            except (IndexError, ValueError) as e:
-                # 파일명 파싱 실패 시 로그 출력
-                print(f"Failed to parse filename: {filename}. Error: {e}")
-    
     return jsonify(photos)
 
 # Safe System 상태 관리

@@ -1,3 +1,5 @@
+import { requestPermission } from './firebase';
+
 //로그아웃
 document.addEventListener('DOMContentLoaded', function() {
     const logoutButton = document.querySelector('.dashboard-header__date');
@@ -132,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // 실시간 사진 업데이트
 function updatePhotoList(photoData) {
     const photoContainer = document.querySelector(".weather-days");
-    // const photoContainer = document.querySelector("#photo-container");
 
     // 기존 사진 리스트 초기화
     photoContainer.innerHTML = "";
@@ -153,6 +154,7 @@ function updatePhotoList(photoData) {
         photoContainer.appendChild(photoItem);
     });
 }
+
 
 
 // 서버에서 사진 정보 가져오기
@@ -178,3 +180,6 @@ async function fetchPhotoData() {
 function onNewPhotoDataReceived(photoData) {
     updatePhotoList(photoData);
 }
+
+    // 푸시 알림 권한 요청 추가
+    requestPermission();
