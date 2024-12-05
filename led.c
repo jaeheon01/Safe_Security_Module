@@ -40,15 +40,21 @@ void* led_thread(void* arg) {
     led_init();
     while (1) {
         pthread_mutex_lock(&signal_mutex);
+        // printf("Wait for the signal.....\n");
         if (signal_status == HIGH) {
             printf("[LED Thread] Turning LED ON.\n");
             led_on();
-        } else {
+
+            pthread_mutex_unlock(&signal_mutex);
+            sleep(5); // 5초 동안 LED 유지
+
+            pthread_mutex_lock(&signal_mutex);
             printf("[LED Thread] Turning LED OFF.\n");
             led_off();
+            signal_status = LOW; // 상태 초기화
         }
         pthread_mutex_unlock(&signal_mutex);
-        usleep(500 * 1000); // 500ms 대기
+        usleep(100 * 1000); // 100ms 대기
     }
     led_cleanup();
     pthread_exit(NULL);

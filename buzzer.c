@@ -39,15 +39,21 @@ void* buzzer_thread(void* arg) {
     buzzer_init();
     while (1) {
         pthread_mutex_lock(&signal_mutex);
+        // printf("Wait for the signal.....\n");
         if (signal_status == HIGH) {
             printf("[BUZZER Thread] Turning BUZZER ON.\n");
             buzzer_on();
-        } else {
+
+            pthread_mutex_unlock(&signal_mutex);
+            sleep(5); // 5초 동안 BUZZER 유지
+
+            pthread_mutex_lock(&signal_mutex);
             printf("[BUZZER Thread] Turning BUZZER OFF.\n");
             buzzer_off();
+            signal_status = LOW; // 상태 초기화
         }
         pthread_mutex_unlock(&signal_mutex);
-        usleep(500 * 1000); // 500ms 대기
+        usleep(100 * 1000); // 100ms 대기
     }
     buzzer_cleanup();
     pthread_exit(NULL);
