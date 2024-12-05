@@ -132,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // 실시간 사진 업데이트
 function updatePhotoList(photoData) {
     const photoContainer = document.querySelector(".weather-days");
+    // const photoContainer = document.querySelector("#photo-container");
 
     // 기존 사진 리스트 초기화
     photoContainer.innerHTML = "";
@@ -158,9 +159,11 @@ function updatePhotoList(photoData) {
 async function fetchPhotoData() {
     try {
         const response = await fetch("/api/photos");
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
         const photoData = await response.json();
         
-        // 서버에서 받은 데이터가 있을 때만 업데이트
         if (photoData.length > 0) {
             updatePhotoList(photoData);
         }
@@ -168,6 +171,7 @@ async function fetchPhotoData() {
         console.error("Failed to fetch photo data:", error);
     }
 }
+
 
 // 사진 데이터가 변경되면 fetchPhotoData 호출
 // 예: 서버에서 사진이 업로드되었을 때 이 함수를 호출
