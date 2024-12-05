@@ -12,7 +12,7 @@
 #define OUT 1
 #define LOW 0
 #define HIGH 1
-#define PIR_PIN 23
+#define PIR_PIN 27
 #define VALUE_MAX 40
 #define DIRECTION_MAX 128
 
@@ -71,7 +71,13 @@ static int GPIOread(int pin){
 	read(fd, value_str,3);
 	close(fd);
 	
+	// if (value_str[0] != '1' && value_str[0] != '0')
+	// {
+	// 	return LOW;
+	// }
+
 	return(value_str[0] == '1') ? HIGH : LOW;
+
 }
 
 

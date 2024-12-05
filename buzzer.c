@@ -10,7 +10,7 @@
 #define LOW 0
 #define VALUE_MAX 40
 #define DIRECTION_MAX 128
-#define BUZZER_PIN 16
+#define BUZZER_PIN 24
 
 // buzzer initialize
 int buzzer_init() {

@@ -71,7 +71,12 @@ static int GPIOread(int pin){
 	read(fd, value_str,3);
 	close(fd);
 	
+	// if (value_str[0] != '1' && value_str[0] != '0')
+	// {
+	// 	return LOW;
+	// }
 	return(value_str[0] == '1') ? HIGH : LOW;
+	
 }
 
 

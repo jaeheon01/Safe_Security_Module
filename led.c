@@ -10,7 +10,7 @@
 #define LOW 0
 #define VALUE_MAX 40
 #define DIRECTION_MAX 128
-#define LED_PIN 12
+#define LED_PIN 23
 
 // LED GPIO pin initialize
 int led_init() {
