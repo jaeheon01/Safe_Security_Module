@@ -40,7 +40,6 @@ void* led_thread(void* arg) {
     led_init();
     while (1) {
         pthread_mutex_lock(&signal_mutex);
-        // printf("Wait for the signal.....\n");
         if (signal_status == HIGH) {
             printf("[LED Thread] Turning LED ON.\n");
             led_on();

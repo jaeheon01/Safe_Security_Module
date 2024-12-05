@@ -39,7 +39,6 @@ void* buzzer_thread(void* arg) {
     buzzer_init();
     while (1) {
         pthread_mutex_lock(&signal_mutex);
-        // printf("Wait for the signal.....\n");
         if (signal_status == HIGH) {
             printf("[BUZZER Thread] Turning BUZZER ON.\n");
             buzzer_on();
