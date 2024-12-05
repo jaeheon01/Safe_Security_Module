@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Safe Monitoring</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="background-cyan">
+    <div class="container">
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <div class="dashboard-header__title">Safe Monitoring</div>
+                <div class="dashboard-header__date" style="cursor: pointer;">로그아웃</div>
+            </div>
+            <div class="dashboard-card">
+                <div class="dashboard-card__title">Safe System</div>
+                <div class="dashboard-card__content">
+                    <label for="switch1">System ON/OFF:</label>
+                    <input type="checkbox" id="switch1" checked>
+                </div>
+            </div>
+            <div class="dashboard-card">
+                <div class="dashboard-card__title">Alarm Status</div>
+                <div id="alarm-status" class="status status_success">
+                    <span id="alarm-icon" class="fa fa-check"></span>
+                    <span id="alarm-text">안전한 상태입니다</span>
+                </div>
+            </div>
+            <div class="dashboard-card weather">
+                <div class="dashboard-card__title"><span class="fa fa-camera"></span>Captured Photos</div>
+                <div class="dashboard-card__content">
+                    <div id="photo-container">
+                        <!-- Photos dynamically updated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+</html>
