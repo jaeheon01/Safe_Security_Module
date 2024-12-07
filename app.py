@@ -3,7 +3,9 @@ import ctypes
 import os
 import shutil
 from shutil import copyfile
-import RPi.GPIO as GPIO
+import glob
+
+# import RPi.GPIO as GPIO
 
 # # C 라이브러리 불러오기
 # example = ctypes.CDLL('./example.so')
@@ -15,9 +17,9 @@ import RPi.GPIO as GPIO
 app = Flask(__name__)
 
 # GPIO 핀 설정
-SENSOR_PIN = 17
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(SENSOR_PIN, GPIO.OUT)
+# SENSOR_PIN = 17
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(SENSOR_PIN, GPIO.OUT)
 
 
 # 로그인 페이지
@@ -47,71 +49,77 @@ def copy_photos():
     if not os.path.exists(static_photo_directory):
         os.makedirs(static_photo_directory)
 
-    # 디렉토리 내의 파일들을 /static/photos/로 복사
-    for filename in os.listdir(photo_directory):
-        if filename.endswith(".jpg"):
-            src_path = os.path.join(photo_directory, filename)
-            dest_path = os.path.join(static_photo_directory, filename)
-            shutil.copy(src_path, dest_path)
+    # 디렉토리 내 최신 파일을 /static/photos/로 복사
+    for file_path in glob.glob(f"{photo_directory}/*.jpg"):
+        filename = os.path.basename(file_path)
+        dest_path = os.path.join(static_photo_directory, filename)
+        if not os.path.exists(dest_path):  # 이미 복사된 파일은 제외
+            shutil.copy(file_path, dest_path)
+
 
 # 사진 데이터를 제공하는 API
 @app.route("/api/photos")
 def get_photos():
     photos = []
-    copy_photos()  # 사진을 /static/photos/ 폴더로 복사
+    copy_photos()
 
-    # /static/photos/ 폴더에서 사진 파일 목록 가져오기
+    # 최신 사진 리스트 생성
     static_photo_directory = "static/photos"
-    for filename in os.listdir(static_photo_directory):
+    for filename in sorted(os.listdir(static_photo_directory), reverse=True):
         if filename.endswith(".jpg"):
-            # 파일 이름에서 날짜와 시간 추출
             timestamp = filename.split("_")[1].split(".")[0]
             date_str = f"{timestamp[:4]}-{timestamp[4:6]}-{timestamp[6:8]}"
             time_str = f"{timestamp[9:11]}:{timestamp[11:13]}:{timestamp[13:15]}"
             photos.append({
-                "filePath": f"/static/photos/{filename}",  # static 폴더 경로
+                "filePath": f"/static/photos/{filename}",
                 "date": date_str,
                 "time": time_str
             })
-
     return jsonify(photos)
 
 # Safe System 상태 관리
 safe_system_state = "off"  # 초기 상태: off
 
-# @app.route('/toggle_sensor', methods=['POST'])
-# def toggle_sensor():
-#     global safe_system_state
-#     data = request.json
-#     new_state = data.get("state")
-
-#     if new_state not in ["on", "off"]:
-#         return jsonify({"success": False, "error": "Invalid state"}), 400
-
-#     # 상태 변경
-#     safe_system_state = new_state
-
-#     # 상태에 따라 state.txt 파일 초기화 및 기록
-#     state_value = "1" if safe_system_state == "on" else "0"
-#     with open("state.txt", "w") as state_file:
-#         state_file.truncate(0)  # 기존 내용 초기화
-#         state_file.write(state_value)
-
-#     return jsonify({"success": True, "message": f"Safe system toggled to {safe_system_state}"})
-
-
 @app.route('/toggle_sensor', methods=['POST'])
 def toggle_sensor():
+    global safe_system_state
     data = request.json
-    state = data.get('state')
-    if state == "on":
-        GPIO.output(SENSOR_PIN, GPIO.HIGH)
-        return jsonify({"message": "Sensor turned ON"}), 200
-    elif state == "off":
-        GPIO.output(SENSOR_PIN, GPIO.LOW)
-        return jsonify({"message": "Sensor turned OFF"}), 200
-    else:
-        return jsonify({"error": "Invalid state"}), 400
+    new_state = data.get("state")
+
+    if new_state not in ["on", "off"]:
+        return jsonify({"success": False, "error": "Invalid state"}), 400
+
+    # 상태 변경
+    safe_system_state = new_state
+
+    # 상태에 따라 state.txt 파일 초기화 및 기록
+    state_value = "1" if safe_system_state == "on" else "0"
+    with open("state.txt", "w") as state_file:
+        state_file.truncate(0)  # 기존 내용 초기화
+        state_file.write(state_value)
+
+    return jsonify({"success": True, "message": f"Safe system toggled to {safe_system_state}"})
+
+
+# @app.route('/toggle_sensor', methods=['POST'])
+# def toggle_sensor():
+#     try:
+#         data = request.json
+#         state = data.get('state')
+        
+#         # 센서 핀 제어 (현재는 입력 핀으로 설정되어 있어 상태 전환이 필요 없음)
+#         if state == "on":
+#             GPIO.setup(SENSOR_PIN, GPIO.OUT)  # 출력으로 변경 (원하는 상태에 맞게)
+#             GPIO.output(SENSOR_PIN, GPIO.HIGH)  # 센서 ON
+#             return jsonify({"message": "Sensor turned ON"}), 200
+#         elif state == "off":
+#             GPIO.setup(SENSOR_PIN, GPIO.OUT)  # 출력으로 변경
+#             GPIO.output(SENSOR_PIN, GPIO.LOW)  # 센서 OFF
+#             return jsonify({"message": "Sensor turned OFF"}), 200
+#         else:
+#             return jsonify({"error": "Invalid state"}), 400
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 # Alarm 상태 관리
 alarm_state = "safe"  # 초기 상태: safe

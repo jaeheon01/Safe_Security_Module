@@ -1,4 +1,12 @@
-import { requestPermission } from './firebase';
+window.onload = () => {
+    fetchPhotoData(); // 페이지 로드 시 첫 데이터 가져오기
+
+    // 5초마다 사진 데이터를 갱신
+    setInterval(() => {
+        fetchPhotoData();
+    }, 5000);
+};
+
 
 //로그아웃
 document.addEventListener('DOMContentLoaded', function() {
@@ -131,6 +139,12 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchAlarmStatus(); // 초기 알람 상태를 서버에서 가져옴
 });
 
+// 실시간 사진 업데이트: 10초마다 fetchPhotoData 호출
+document.addEventListener("DOMContentLoaded", () => {
+    fetchPhotoData(); // 초기 로드
+    setInterval(fetchPhotoData, 10000); // 10초 간격으로 갱신
+});
+
 // 실시간 사진 업데이트
 function updatePhotoList(photoData) {
     const photoContainer = document.querySelector(".weather-days");
@@ -148,7 +162,7 @@ function updatePhotoList(photoData) {
             <div class="weather-days__icon">
                 <img src="${photo.filePath}" alt="Captured Photo" class="weather-icon-image">
             </div>
-            <div class="weather-days__humidity">${photo.time}</div> <!-- 시간 추가 -->
+            <div class="weather-days__humidity">${photo.time}</div> 
         `;
 
         photoContainer.appendChild(photoItem);
@@ -181,5 +195,5 @@ function onNewPhotoDataReceived(photoData) {
     updatePhotoList(photoData);
 }
 
-    // 푸시 알림 권한 요청 추가
-    requestPermission();
+// 푸시 알림 권한 요청 추가
+requestPermission();
