@@ -35,7 +35,7 @@
 ### 디렉토리 구조
 ```bash
 system_programming_project/
-├─- web
+├── web
 ├── buzzer.c
 ├── camera.c
 ├── camera.h
