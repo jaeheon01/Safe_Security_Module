@@ -1,0 +1,165 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Safe Monitoring</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+
+    <link rel="stylesheet" href="./dashboard.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.9/css/weather-icons.min.css">
+</head>
+<body class="background-cyan">
+    <div class="container">
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <div class="dashboard-header__title">Safe Monitoring</div>
+                <div class="dashboard-header__date" style="cursor: pointer;">로그아웃</div>
+            </div>
+
+            <div class="dashboard-card temperature">
+                <div class="dashboard-card__title"><span class="fa fa-wifi"></span>Safe System</div>
+                <div class="dashboad-card__content">
+                    <div class="dashboard-card__card-piece">
+                        <div class="status status_success" id="safe-status">
+                            <div class="status__icon"><span class="fa fa-check" id="safe-icon"></span></div>
+                            <div class="status__text" id="safe-text">Activated</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-card alarm">
+                <div class="dashboard-card__title"><span class="fa fa-bell-o"></span>Alarm</div>
+                <div class="dashboad-card__content">
+                    <div class="dashboard-card__card-piece">
+                        <div class="status status_success" id="alarm-status">
+                            <div class="status__icon"><span class="fa fa-check" id="alarm-icon"></span></div>
+                            <div class="status__text" id="alarm-text">안전한 상태입니다</div>
+                        </div>
+                        <a href="#" class="dashboard-card__link" tabindex="1">photo<span class="fa fa-angle-right"></span></a>
+                    </div>
+                </div>
+            </div>
+            
+
+             <div class="dashboard-card weather">
+                <div class="dashboard-card__title"><span class="fa fa-camera"></span>Photo</div>
+                <div class="dashboad-card__content">
+                    <div class="dashboard-card__card-piece">
+                        <div class="weather-days" id="photo-container">
+                            <div class="weather-days__icon">
+                                <img src="{{ url_for('static', filename='photo_01.jpg') }}" alt="Captured Photo" class="weather-icon-image">
+                            </div>
+                        </div>
+                        <a href="#" class="dashboard-card__link" tabindex="1">View in details<span class="fa fa-angle-right"></span></a>
+                    </div>
+                </div>
+            </div> 
+          
+            <!-- <div class="dashboard-card weather">
+                <div class="dashboard-card__title"><span class="fa fa-camera"></span>Photo</div>
+                <div class="dashboad-card__content">
+                    <div class="dashboard-card__card-piece">
+                        <div class="weather-days">
+                            <div class="weather-days__item">
+                                <div class="weather-days__title">11/27</div>
+                                <div class="weather-days__icon">
+                                    <img src="path/to/cloudy-image.jpg" alt="Cloudy" class="weather-icon-image">
+                                </div>
+                                <div class="weather-days__humidity">23:57:01</div>
+                            </div>
+                            <div class="weather-days__item">
+                                <div class="weather-days__title">11/20</div>
+                                <div class="weather-days__icon">
+                                    <img src="path/to/cloudy-image.jpg" alt="Cloudy" class="weather-icon-image">
+                                </div>
+                                <div class="weather-days__humidity">23:57:01</div>
+                            </div>
+                            <div class="weather-days__item">
+                                <div class="weather-days__title">11/15</div>
+                                <div class="weather-days__icon">
+                                    <img src="path/to/cloudy-image.jpg" alt="Cloudy" class="weather-icon-image">
+                                </div>
+                                <div class="weather-days__humidity">23:57:01</div>
+                            </div>
+                            <div class="weather-days__item">
+                                <div class="weather-days__title">10/30</div>
+                                <div class="weather-days__icon">
+                                    <img src="path/to/cloudy-image.jpg" alt="Cloudy" class="weather-icon-image">
+                                </div>
+                                <div class="weather-days__humidity">23:57:01</div>
+                            </div>
+                            <div class="weather-days__item">
+                                <div class="weather-days__title">9/3</div>
+                                <div class="weather-days__icon">
+                                    <img src="path/to/cloudy-image.jpg" alt="Cloudy" class="weather-icon-image">
+                                </div>
+                                <div class="weather-days__humidity">23:57:01</div>
+                            </div>
+                        </div>
+                        <a href="#" class="dashboard-card__link" tabindex="1">View in details<span class="fa fa-angle-right"></span></a>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- <div class="dashboard-card weather">
+                <div class="dashboard-card__title"><span class="fa fa-camera"></span>Photo</div>
+                <div class="dashboard-card__content">
+                    <div class="dashboard-card__card-piece">
+                        <div class="weather-days" id="photo-container">
+                            <div class="weather-days__item">
+                                <div class="weather-days__icon">
+                                    <img src="{{ url_for('static', filename='photo_01.jpg') }}" alt="Captured Photo" class="weather-icon-image">
+                                </div>
+                                <div class="weather-days__date">2024-11-27</div> 
+                            </div>
+                        </div>
+                        <a href="#" class="dashboard-card__link" tabindex="1">View in details<span class="fa fa-angle-right"></span></a>
+                    </div>
+                </div>
+            </div>
+             -->
+
+            <div class="dashboard-card light">
+                <div class="dashboard-card__title"><span class="fa fa-lightbulb-o"></span>Safe System</div>
+                <div class="dashboad-card__content">
+                    <div class="dashboard-card__card-piece">
+                        <div class="light-switches">
+                            <div class="switch switch_order-1">
+                                <div class="switch__name">Safe System ON/OFF</div>
+                                <input type="checkbox" id="switch1" class="switch__input" tabindex="2" checked>
+                                <label for="switch1" class="switch__label"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+
+    <!-- <script src="./dashboard.js"></script> -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyAuBwQT6kxUoSiieUdc6hKs4TQphvCOn_I",
+          authDomain: "system-pr.firebaseapp.com",
+          databaseURL: "https://system-pr-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "system-pr",
+          storageBucket: "system-pr.firebasestorage.app",
+          messagingSenderId: "365621185419",
+          appId: "1:365621185419:web:76bd48f9f949e75a95bd8e"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+      </script>
+</body>
+
+</html>

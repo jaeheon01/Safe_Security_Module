@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    
+    <link rel="stylesheet" href="./auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="auth-box">
+        <h2>SAFE SERVICE LOGIN</h2>
+        <form id="login-form">
+            <div class="user-box">
+                <label for="studentid">ID</label>
+                <input type="text" id="studentid" name="studentid" required="">
+            </div>
+            <div class="user-box">         
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required="">
+            </div>
+            <div class="submit-container">
+                <button id="signup-btn" type="button" class="login-button raised flat">SIGN UP</button>
+                <button id="btn" type="submit" class="login-button raised">SIGN IN</button>
+            </div>
+        </form>
+        <p id="login-status"></p>
+    </div>
+
+    <script>
+        // Sign Up 버튼 클릭 시 회원가입 페이지로 이동
+        document.getElementById('signup-btn').addEventListener('click', function() {
+            window.location.href = 'register.html'; // 회원가입 페이지 경로로 설정
+        });
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const studentId = document.getElementById('studentid').value;
+            const password = document.getElementById('password').value;
+
+            if (studentId === "test" && password === "1234") {
+                window.location.href = '/dashboard.html';
+            } else {
+                document.getElementById('login-status').textContent = 'ID 또는 Password 오류입니다. 다시 시도하세요.';
+                document.getElementById('login-status').style.color = 'red';
+            }
+        });
+    </script>
+    <script src="./login_client.js"></script>
+    <script src="{{ url_for('static', filename='login_client.js') }}"></script>
+</body>
+</html>
