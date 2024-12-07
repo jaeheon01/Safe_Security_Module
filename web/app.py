@@ -5,7 +5,7 @@ import shutil
 from shutil import copyfile
 import glob
 
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 # # C 라이브러리 불러오기
 # example = ctypes.CDLL('./example.so')
@@ -17,9 +17,13 @@ import glob
 app = Flask(__name__)
 
 # GPIO 핀 설정
-# SENSOR_PIN = 17
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setup(SENSOR_PIN, GPIO.OUT)
+VIBRATION_SENSOR_PIN = 17
+MOTION_SENSOR_PIN = 22
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(VIBRATION_SENSOR_PIN, GPIO.OUT)
+GPIO.setup(MOTION_SENSOR_PIN, GPIO.OUT)
+
 
 
 # 로그인 페이지
@@ -80,49 +84,50 @@ def get_photos():
 # Safe System 상태 관리
 safe_system_state = "off"  # 초기 상태: off
 
-@app.route('/toggle_sensor', methods=['POST'])
-def toggle_sensor():
-    global safe_system_state
-    data = request.json
-    new_state = data.get("state")
-
-    if new_state not in ["on", "off"]:
-        return jsonify({"success": False, "error": "Invalid state"}), 400
-
-    # 상태 변경
-    safe_system_state = new_state
-
-    # 상태에 따라 state.txt 파일 초기화 및 기록
-    state_value = "1" if safe_system_state == "on" else "0"
-    with open("state.txt", "w") as state_file:
-        state_file.truncate(0)  # 기존 내용 초기화
-        state_file.write(state_value)
-
-    return jsonify({"success": True, "message": f"Safe system toggled to {safe_system_state}"})
-
-
 # @app.route('/toggle_sensor', methods=['POST'])
 # def toggle_sensor():
-#     try:
-#         data = request.json
-#         state = data.get('state')
-        
-#         # 센서 핀 제어 (현재는 입력 핀으로 설정되어 있어 상태 전환이 필요 없음)
-#         if state == "on":
-#             GPIO.setup(SENSOR_PIN, GPIO.OUT)  # 출력으로 변경 (원하는 상태에 맞게)
-#             GPIO.output(SENSOR_PIN, GPIO.HIGH)  # 센서 ON
-#             return jsonify({"message": "Sensor turned ON"}), 200
-#         elif state == "off":
-#             GPIO.setup(SENSOR_PIN, GPIO.OUT)  # 출력으로 변경
-#             GPIO.output(SENSOR_PIN, GPIO.LOW)  # 센서 OFF
-#             return jsonify({"message": "Sensor turned OFF"}), 200
-#         else:
-#             return jsonify({"error": "Invalid state"}), 400
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
+#     global safe_system_state
+#     data = request.json
+#     new_state = data.get("state")
+
+#     if new_state not in ["on", "off"]:
+#         return jsonify({"success": False, "error": "Invalid state"}), 400
+
+#     # 상태 변경
+#     safe_system_state = new_state
+
+#     # 상태에 따라 state.txt 파일 초기화 및 기록
+#     state_value = "1" if safe_system_state == "on" else "0"
+#     with open("state.txt", "w") as state_file:
+#         state_file.truncate(0)  # 기존 내용 초기화
+#         state_file.write(state_value)
+
+#     return jsonify({"success": True, "message": f"Safe system toggled to {safe_system_state}"})
+
+
+@app.route('/toggle_sensor', methods=['POST'])
+def toggle_sensor():
+    try:
+        data = request.json
+        sensor = data.get('sensor')
+        state = data.get('state')
+
+        # 진동 센서 제어
+        if state == "on":
+            GPIO.output(VIBRATION_SENSOR_PIN, GPIO.HIGH)
+            GPIO.output(MOTION_SENSOR_PIN, GPIO.HIGH)
+            return jsonify({"message": "Vibration, Motion sensor turned ON"}), 200
+        else:
+            GPIO.output(VIBRATION_SENSOR_PIN, GPIO.LOW)
+            GPIO.output(MOTION_SENSOR_PIN, GPIO.LOW)
+            return jsonify({"message": "Vibration, Motion sensor turned OFF"}), 200
+
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Alarm 상태 관리
-alarm_state = "safe"  # 초기 상태: safe
+#alarm_state = "safe"  # 초기 상태: safe
 
 @app.route('/get_alarm_status', methods=['GET'])
 def get_alarm_status():
