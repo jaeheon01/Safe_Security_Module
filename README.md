@@ -47,6 +47,18 @@ system_programming_project/
 ├── server.c
 ├── shared.h
 └── vibration.c
+system_programming_project/web
+├── app.py
+├── templates/
+├── dashboard.html
+├── login.html
+├── register.html
+├── static/
+├── auth.css
+├── dashboard.css
+├── dashboard.js
+├── login_client.js
+└── register_client.js
 ```
 
 ## 시스템 구성
