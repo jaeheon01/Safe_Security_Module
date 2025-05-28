@@ -1,98 +1,65 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+#include <string.h>
 #include <unistd.h>
-#include <pthread.h>
 #include "shared.h"
 
 #define OUT 1
 #define HIGH 1
 #define LOW 0
-#define BUZZER_PIN 24 // 부저가 연결된 GPIO 핀 번호
 #define VALUE_MAX 40
 #define DIRECTION_MAX 128
+#define BUZZER_PIN 24
 
-static int GPIOExport(int pin);
-static int GPIODirection(int pin, int dir);
-static int GPIOWrite(int pin, int value);
-static int GPIOUnexport(int pin);
-
-void* buzzer_control(void* arg) {
-    if (GPIOExport(BUZZER_PIN) == -1) pthread_exit(NULL);
-    if (GPIODirection(BUZZER_PIN, OUT) == -1) pthread_exit(NULL);
-
+// 부저(GPIO PIN)을 사용하기 위한 초기 설정
+// 1) GPIOExport로 부저핀을 export하여 sysfs 인터페이스로 접근 가능하게 만들고
+// 2) GPIODirection을 통해 해당 핀을 출력 모드로 설정한다.
+int buzzer_init() {
+    if (GPIOExport(BUZZER_PIN) == -1) {
+        fprintf(stderr, "[BUZZER] Failed to export GPIO pin.\n");
+        return -1;
+    }
+    if (GPIODirection(BUZZER_PIN, OUT) == -1) {
+        fprintf(stderr, "[BUZZER] Failed to set GPIO direction.\n");
+        return -1;
+    }
+    return 0;
+}
+// 부저 켜기 (해당 핀에 HIGH 신호 출력)
+int buzzer_on() {
+    return GPIOWrite(BUZZER_PIN, HIGH);
+}
+// 부저 끄기 (해당 핀에 LOW 신호 출력)
+int buzzer_off() {
+    return GPIOWrite(BUZZER_PIN, LOW);
+}
+// 사용한 부저 핀을 unexport하여 GPIO 리소스를 반환
+int buzzer_cleanup() {
+    return GPIOUnexport(BUZZER_PIN);
+}
+// 부저를 제어하는 스레드 함수
+void* buzzer_thread(void* arg) {
+    buzzer_init();
     while (1) {
-        pthread_mutex_lock(&lock);
-        while (step != 2) { // 데이터가 수신될 때까지 대기
-            pthread_cond_wait(&cond, &lock);
+        // signal_status를 안전하게 확인하기 위해 뮤텍스 lock
+        pthread_mutex_lock(&signal_mutex);
+        // signal_status가 HIGH인 경우 부저를 켜서 경고음을 낸다.
+        if (signal_status == HIGH) {
+            printf("[BUZZER Thread] Turning BUZZER ON.\n");
+            buzzer_on();
+
+            pthread_mutex_unlock(&signal_mutex);
+            sleep(5); // 5초 동안 BUZZER 유지
+
+            pthread_mutex_lock(&signal_mutex);
+            printf("[BUZZER Thread] Turning BUZZER OFF.\n");
+            buzzer_off();
+            signal_status = LOW; // 상태 초기화
         }
-
-        // 두 센서가 모두 감지된 경우 Buzzer ON, 그렇지 않으면 OFF
-        if (motion_detected && vibration_detected) {
-            printf("[Buzzer] Intrusion detected by both sensors! Turning Buzzer ON.\n");
-            GPIOWrite(BUZZER_PIN, HIGH);
-        } else {
-            printf("[Buzzer] No intrusion detected. Turning Buzzer OFF.\n");
-            GPIOWrite(BUZZER_PIN, LOW);
-        }
-
-        step = 0; // 작업 완료 후 단계 초기화
-        pthread_mutex_unlock(&lock);
-        usleep(500 * 1000); // 500ms 대기
+        pthread_mutex_unlock(&signal_mutex);
+        usleep(100 * 1000); // 100ms 대기
     }
-
-    if (GPIOUnexport(BUZZER_PIN) == -1) {
-        fprintf(stderr, "[Buzzer] Failed to unexport GPIO pin.\n");
-    }
+    buzzer_cleanup();
     pthread_exit(NULL);
-}
-
-static int GPIOExport(int pin) {
-    char buffer[3];
-    ssize_t bytes_written;
-    int fd = open("/sys/class/gpio/export", O_WRONLY);
-    if (fd == -1) return -1;
-
-    bytes_written = snprintf(buffer, sizeof(buffer), "%d", pin);
-    write(fd, buffer, bytes_written);
-    close(fd);
-    return 0;
-}
-
-static int GPIODirection(int pin, int dir) {
-    char path[DIRECTION_MAX];
-    snprintf(path, sizeof(path), "/sys/class/gpio/gpio%d/direction", pin);
-    int fd = open(path, O_WRONLY);
-    if (fd == -1) return -1;
-
-    const char* direction = (dir == OUT) ? "out" : "in";
-    write(fd, direction, strlen(direction));
-    close(fd);
-    return 0;
-}
-
-static int GPIOWrite(int pin, int value) {
-    char path[VALUE_MAX];
-    snprintf(path, sizeof(path), "/sys/class/gpio/gpio%d/value", pin);
-    int fd = open(path, O_WRONLY);
-    if (fd == -1) return -1;
-
-    const char* val_str = (value == HIGH) ? "1" : "0";
-    write(fd, val_str, strlen(val_str));
-    close(fd);
-    return 0;
-}
-
-static int GPIOUnexport(int pin) {
-    char buffer[3];
-    ssize_t bytes_written;
-    int fd = open("/sys/class/gpio/unexport", O_WRONLY);
-    if (fd == -1) return -1;
-
-    bytes_written = snprintf(buffer, sizeof(buffer), "%d", pin);
-    write(fd, buffer, bytes_written);
-    close(fd);
-    return 0;
 }
