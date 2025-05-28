@@ -33,7 +33,7 @@
   - 쓰레드 간 공유되는 변수와 함수의 선언
 ### 디렉토리 구조
 ```bash
-system_programming_project/
+Safe_Security_Module/
 ├── web
 ├── buzzer.c
 ├── camera.c
@@ -46,7 +46,7 @@ system_programming_project/
 ├── server.c
 ├── shared.h
 └── vibration.c
-system_programming_project/web
+Safe_Security_Module/web
 ├── app.py
 ├── templates/
 ├── dashboard.html
